@@ -39,4 +39,37 @@ def draw_fig(color = WHITE):
             if board[row][col] == 1:
                 pygame.draw.circle(screen, color, (int(col * SQSIZE + SQSIZE // 2), int(row * SQSIZE + SQSIZE // 2)), RAD, CIRC)
             elif board[row][col] == 2:
-                pygame.draw.line(screen, color, start_pos;(col *SQSIZE +SQSIZE //4, row*SQSIZE + SQSIZE //4), (row*SQSIZE+ 3*SQSIZE)) 
+                    pygame.draw.line(screen, color, (col * SQSIZE + SQSIZE // 4, row * SQSIZE + SQSIZE // 4), 
+                    (col * SQSIZE + 3 * SQSIZE // 4, row * SQSIZE + 3 * SQSIZE // 4))
+                    pygame.draw.line(screen, color, (col * SQSIZE + SQSIZE // 4, row * SQSIZE + 3 * SQSIZE // 4), 
+                    (col * SQSIZE + 3 * SQSIZE // 4, row * SQSIZE + SQSIZE // 4))
+def available_square(row, col):
+     return board[row][col] == 0
+def mark_square(row, col, player):
+     board[row][col] = player
+
+def isFull(check_board = board):
+      for row in range (ROW):
+           for col in range(COL):
+                if check_board[row][col] == 0:
+                     return True
+      return False
+
+def chack_win(player, check_board = board):
+    for col in range(COL):
+        if check_board[0][col] == player and check_board[1][col] == player and check_board[1][col] == player:
+            return True
+    for row in range(ROW):
+        if check_board[row][0] == player and check_board[row][1] == player and check_board[row][2] == player:
+            return True    
+    if check_board[0][0] == player and check_board[1][1] == player and check_board[2][2] == player:
+            return True
+    if check_board[2][0] == player and check_board[1][1] == player and check_board[0][2] == player:
+            return True
+    
+    return False
+
+
+
+def minimax(minimax_board, depth, is_maximizing):
+     
