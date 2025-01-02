@@ -4,12 +4,14 @@ import numpy as np
 
 pygame.init()
 
+# Colors
 WHITE = (255, 255, 255)
 GRAY = (180, 180, 180)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 
+# Dimensions and game settings
 WIDTH = 300
 HEIGHT = 300
 LINE_WIDTH = 5
@@ -20,6 +22,9 @@ RAD = SQSIZE // 3
 CIRC = 15
 CROSS = 25
 
+font = pygame.font.Font(None, 40)  # Default Pygame font, size 40
+
+# Initializing
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Tic Tac Toe')
 screen.fill(BLACK)
@@ -46,9 +51,11 @@ def draw_fig(color=WHITE):
                                  (col * SQSIZE + SQSIZE // 4, row * SQSIZE + 3 * SQSIZE // 4), 
                                  (col * SQSIZE + 3 * SQSIZE // 4, row * SQSIZE + SQSIZE // 4), CROSS)
 
+# Check for available square
 def available_square(row, col):
     return board[row][col] == 0
 
+# Mark square occupied by players
 def mark_square(row, col, player):
     board[row][col] = player
 
@@ -71,12 +78,13 @@ def check_win(player):
         return True
     return False
 
+# Minimax algorithm 
 def minimax(minimax_board, depth, is_maximizing):
     if check_win(2):  # Computer wins
         return 10 - depth
-    elif check_win(1):  # Player wins
+    elif check_win(1):  # User wins
         return depth - 10
-    elif isFull():  # Tie
+    elif isFull():  # Draw
         return 0
 
     if is_maximizing:
@@ -115,15 +123,22 @@ def best_move():
     if move != (-1, -1):
         mark_square(move[0], move[1], 2)
 
-# Reset al boxes
+# Reset all boxes
 def restart():
     screen.fill(BLACK)
     draw_lines()
     board.fill(0)
 
+def display_result(text, color):
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(text_surface, text_rect)
+
+# Main loop
 draw_lines()
 player = 1
 game_over = False
+result_text = ""
 
 while True:
     for event in pygame.event.get():
@@ -139,24 +154,39 @@ while True:
                 mark_square(mouseY, mouseX, player)
                 if check_win(player):
                     game_over = True
+                    result_text = "USER Wins!" if player == 1 else "COMPUTER Wins!"
                 player = 3 - player  # Switch player
 
         if not game_over and player == 2:
             best_move()
             if check_win(2):
                 game_over = True
-                player = 3 - player
+                result_text = "COMPUTER Wins!"
+            player = 1
 
         if not game_over and isFull():
             game_over = True
+            result_text = "It's a Tie!"
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 restart()
                 game_over = False
                 player = 1
+                result_text = ""
 
     screen.fill(BLACK)
     draw_lines()
     draw_fig()
+
+    if game_over:
+        if check_win(1):
+            draw_lines(GREEN)
+        elif check_win(2):
+            draw_lines(RED)
+        else:
+            draw_lines(GRAY)
+
+        display_result(result_text, RED if result_text.startswith("COMPUTER") else GREEN if result_text.startswith("USER") else GRAY)
+
     pygame.display.update()
